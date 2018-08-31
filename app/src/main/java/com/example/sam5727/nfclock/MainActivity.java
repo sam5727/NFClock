@@ -5,9 +5,16 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,6 +33,14 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        Date currentTime = Calendar.getInstance().getTime();
+        SimpleDateFormat dfTime = new SimpleDateFormat("HH:mm", Locale.CHINESE);
+        SimpleDateFormat dfDate = new SimpleDateFormat("M月d日, EEEE", Locale.CHINESE);
+        TextView titleDate = (TextView) findViewById(R.id.titleDate);
+        TextView titleTime = (TextView) findViewById(R.id.titleTime);
+        titleDate.setText(dfDate.format(currentTime));
+        titleTime.setText(dfTime.format(currentTime));
     }
 
     @Override
