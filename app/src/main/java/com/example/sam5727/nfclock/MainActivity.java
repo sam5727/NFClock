@@ -10,9 +10,11 @@ import android.text.format.DateFormat;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -44,14 +46,21 @@ public class MainActivity extends AppCompatActivity {
         titleDate.setText(dfDate.format(currentTime));
         titleTime.setText(dfTime.format(currentTime));
 
-        final Handler someHandler = new Handler(getMainLooper());
-        someHandler.postDelayed(new Runnable() {
+        final Handler tikHandler = new Handler(getMainLooper());
+        tikHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 titleTime.setText(dfTime.format(new Date()));
-                someHandler.postDelayed(this, 1000);
+                tikHandler.postDelayed(this, 1000);
             }
         }, 10);
+
+        ArrayList<ClockOverview> clockList = new ArrayList<ClockOverview>();
+        clockList.add(new ClockOverview(dfTime.format(new Date())));
+
+        final ListView clockView = (ListView) findViewById(R.id.clockView);
+        ClockAdapter adapter = new ClockAdapter(this, clockList);
+        clockView.setAdapter(adapter);
     }
 
     @Override
