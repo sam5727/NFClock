@@ -1,5 +1,6 @@
 package com.example.sam5727.nfclock;
 
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,15 +33,6 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         Date currentTime = Calendar.getInstance().getTime();
         final TextView titleDate = (TextView) findViewById(R.id.titleDate);
         final TextView titleTime = (TextView) findViewById(R.id.titleTime);
@@ -55,12 +48,32 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 10);
 
-        ArrayList<ClockOverview> clockList = new ArrayList<ClockOverview>();
+        final ArrayList<ClockOverview> clockList = new ArrayList<ClockOverview>();
         clockList.add(new ClockOverview(dfTime.format(new Date())));
 
         final ListView clockView = (ListView) findViewById(R.id.clockView);
         ClockAdapter adapter = new ClockAdapter(this, clockList);
         clockView.setAdapter(adapter);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Use the current time as the default values for the picker
+                final Calendar calendar = Calendar.getInstance();
+                new TimePickerDialog(MainActivity.this, new TimePickerDialog.OnTimeSetListener(){
+
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
+                        clockList.add(new ClockOverview(dfTime.format(calendar.getTime())));
+                        ClockAdapter adapter = new ClockAdapter(MainActivity.this, clockList);
+                        clockView.setAdapter(adapter);
+                    }
+                }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show();
+            }
+        });
     }
 
     @Override
