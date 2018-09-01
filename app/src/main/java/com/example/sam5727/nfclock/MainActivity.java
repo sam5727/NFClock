@@ -1,6 +1,7 @@
 package com.example.sam5727.nfclock;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,9 @@ import java.util.Date;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+
+    private SimpleDateFormat dfTime = new SimpleDateFormat("HH:mm", Locale.CHINESE);
+    private SimpleDateFormat dfDate = new SimpleDateFormat("M月d日, EEEE", Locale.CHINESE);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,12 +39,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Date currentTime = Calendar.getInstance().getTime();
-        SimpleDateFormat dfTime = new SimpleDateFormat("HH:mm", Locale.CHINESE);
-        SimpleDateFormat dfDate = new SimpleDateFormat("M月d日, EEEE", Locale.CHINESE);
-        TextView titleDate = (TextView) findViewById(R.id.titleDate);
-        TextView titleTime = (TextView) findViewById(R.id.titleTime);
+        final TextView titleDate = (TextView) findViewById(R.id.titleDate);
+        final TextView titleTime = (TextView) findViewById(R.id.titleTime);
         titleDate.setText(dfDate.format(currentTime));
         titleTime.setText(dfTime.format(currentTime));
+
+        final Handler someHandler = new Handler(getMainLooper());
+        someHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                titleTime.setText(dfTime.format(new Date()));
+                someHandler.postDelayed(this, 1000);
+            }
+        }, 10);
     }
 
     @Override
