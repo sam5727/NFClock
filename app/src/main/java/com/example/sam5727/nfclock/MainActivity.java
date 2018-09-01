@@ -1,6 +1,10 @@
 package com.example.sam5727.nfclock;
 
+import android.app.AlarmManager;
+import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -25,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
     private SimpleDateFormat dfTime = new SimpleDateFormat("HH:mm", Locale.CHINESE);
     private SimpleDateFormat dfDate = new SimpleDateFormat("M月d日, EEEE", Locale.CHINESE);
+    private ArrayList<PendingIntent> intentArray = new ArrayList<PendingIntent>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +66,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // Use the current time as the default values for the picker
                 final Calendar calendar = Calendar.getInstance();
-                new TimePickerDialog(MainActivity.this, new TimePickerDialog.OnTimeSetListener(){
-
+                new TimePickerDialog(MainActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_DARK, new TimePickerDialog.OnTimeSetListener(){
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
@@ -70,6 +74,14 @@ public class MainActivity extends AppCompatActivity {
                         clockList.add(new ClockOverview(dfTime.format(calendar.getTime())));
                         ClockAdapter adapter = new ClockAdapter(MainActivity.this, clockList);
                         clockView.setAdapter(adapter);
+
+                        // Set broadcast
+                        Intent intent = new Intent(MainActivity.this, Alarm.class);
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
+                        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + intentArray.size() * 2000, pendingIntent);
+
+                        intentArray.add(pendingIntent);
                     }
                 }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show();
             }
