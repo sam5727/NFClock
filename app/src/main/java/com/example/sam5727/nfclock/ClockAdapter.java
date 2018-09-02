@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -33,6 +34,14 @@ public class ClockAdapter extends ArrayAdapter<ClockOverview> {
 
         TextView caseValue = (TextView) listItemView.findViewById(R.id.clockDay);
         caseValue.setText("今天");
+
+        LinearLayout clockLayout = (LinearLayout) listItemView.findViewById(R.id.clockLayout);
+        clockLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         return listItemView;
     }

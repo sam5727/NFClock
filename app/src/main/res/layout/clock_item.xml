@@ -5,6 +5,7 @@
     android:layout_height="100dp">
 
     <LinearLayout
+        android:id="@+id/clockLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_toLeftOf="@id/clockSwitch"

@@ -12,24 +12,28 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
     private SimpleDateFormat dfTime = new SimpleDateFormat("HH:mm", Locale.CHINESE);
     private SimpleDateFormat dfDate = new SimpleDateFormat("M月d日, EEEE", Locale.CHINESE);
     private ArrayList<PendingIntent> intentArray = new ArrayList<PendingIntent>();
+    private String createMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,34 +58,47 @@ public class MainActivity extends AppCompatActivity {
         }, 10);
 
         final ArrayList<ClockOverview> clockList = new ArrayList<ClockOverview>();
-        clockList.add(new ClockOverview(dfTime.format(new Date())));
 
         final ListView clockView = (ListView) findViewById(R.id.clockView);
         ClockAdapter adapter = new ClockAdapter(this, clockList);
         clockView.setAdapter(adapter);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
                 // Use the current time as the default values for the picker
                 final Calendar calendar = Calendar.getInstance();
                 new TimePickerDialog(MainActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_DARK, new TimePickerDialog.OnTimeSetListener(){
                     @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                    public void onTimeSet(TimePicker vieww, int hourOfDay, int minute) {
+                        int requestCode = hourOfDay * 100 + minute;
+                        Long currentTime = calendar.getTimeInMillis();
                         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         calendar.set(Calendar.MINUTE, minute);
-                        clockList.add(new ClockOverview(dfTime.format(calendar.getTime())));
+                        calendar.set(Calendar.SECOND, 0);
+                        clockList.add(new ClockOverview(dfTime.format(calendar.getTime()), requestCode));
                         ClockAdapter adapter = new ClockAdapter(MainActivity.this, clockList);
                         clockView.setAdapter(adapter);
 
+                        Long differ = calendar.getTimeInMillis() - currentTime;
+                        if (differ < 0)
+                            differ += 86400000;
+
+                        createMessage = String.format(Locale.CHINESE, "%d hour, %d min",
+                                TimeUnit.MILLISECONDS.toHours(differ),
+                                TimeUnit.MILLISECONDS.toMinutes(differ) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(differ))
+                        );
+
+                        Snackbar.make(view, createMessage, Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+
                         // Set broadcast
                         Intent intent = new Intent(MainActivity.this, Alarm.class);
-                        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), requestCode, intent, 0);
                         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-                        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + intentArray.size() * 2000, pendingIntent);
-
-                        intentArray.add(pendingIntent);
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + differ, pendingIntent);
+                        // intentArray.add(pendingIntent);
                     }
                 }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show();
             }
