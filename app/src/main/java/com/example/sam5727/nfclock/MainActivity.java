@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
+                calendar = Calendar.getInstance();
                 // Use the current time as the default values for the picker
                 new TimePickerDialog(MainActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_DARK, new TimePickerDialog.OnTimeSetListener(){
                     @Override
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
                         int requestCode = hourOfDay * 100 + minute;
                         calendar = Calendar.getInstance();
                         calendar.set(Calendar.SECOND, 0);
+                        calendar.set(Calendar.MILLISECOND, 0);
                         Long currentTime = calendar.getTimeInMillis();
                         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         calendar.set(Calendar.MINUTE, minute);
@@ -84,8 +86,10 @@ public class MainActivity extends AppCompatActivity {
                         clockView.setAdapter(adapter);
 
                         Long differ = calendar.getTimeInMillis() - currentTime;
-                        if (differ < 0)
+                        if (differ <= 0){
                             differ += 86400000;
+                            calendar.add(Calendar.HOUR_OF_DAY, 1);
+                        }
 
                         createMessage = String.format(Locale.CHINESE, "%d hour, %d min",
                                 TimeUnit.MILLISECONDS.toHours(differ),
@@ -95,11 +99,12 @@ public class MainActivity extends AppCompatActivity {
                         Snackbar.make(view, createMessage, Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
 
+                        Log.e("ttt", calendar.getTimeInMillis() + "");
                         // Set broadcast
                         Intent intent = new Intent(MainActivity.this, Alarm.class);
                         PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), requestCode, intent, 0);
                         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-                        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + differ, pendingIntent);
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
                         intentArray.add(pendingIntent);
                     }
                 }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show();
