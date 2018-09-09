@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(final View view) {
                 calendar = Calendar.getInstance();
                 // Use the current time as the default values for the picker
-                new TimePickerDialog(MainActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_DARK, new TimePickerDialog.OnTimeSetListener(){
+                new TimePickerDialog(MainActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_DARK, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker pickerView, int hourOfDay, int minute) {
                         int requestCode = hourOfDay * 100 + minute;
@@ -81,15 +81,16 @@ public class MainActivity extends AppCompatActivity {
                         Long currentTime = calendar.getTimeInMillis();
                         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         calendar.set(Calendar.MINUTE, minute);
-                        clockList.add(new ClockOverview(dfTime.format(calendar.getTime()), requestCode));
-                        ClockAdapter adapter = new ClockAdapter(MainActivity.this, clockList);
-                        clockView.setAdapter(adapter);
 
                         Long differ = calendar.getTimeInMillis() - currentTime;
-                        if (differ <= 0){
+                        if (differ <= 0) {
                             differ += 86400000;
                             calendar.add(Calendar.HOUR_OF_DAY, 1);
                         }
+
+                        clockList.add(new ClockOverview(dfTime.format(calendar.getTime()), requestCode, calendar));
+                        ClockAdapter adapter = new ClockAdapter(MainActivity.this, clockList);
+                        clockView.setAdapter(adapter);
 
                         createMessage = String.format(Locale.CHINESE, "%d hour, %d min",
                                 TimeUnit.MILLISECONDS.toHours(differ),
@@ -102,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("ttt", calendar.getTimeInMillis() + "");
                         // Set broadcast
                         Intent intent = new Intent(MainActivity.this, Alarm.class);
-                        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), requestCode, intent, 0);
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, requestCode, intent, 0);
                         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
                         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
                         intentArray.add(pendingIntent);
