@@ -4,9 +4,13 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -21,18 +25,25 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
+    private SharedPreferences shref;
+    public FloatingActionButton fab;
     private SimpleDateFormat dfTime = new SimpleDateFormat("HH:mm", Locale.CHINESE);
     private SimpleDateFormat dfDate = new SimpleDateFormat("M月d日, EEEE", Locale.CHINESE);
     private ArrayList<PendingIntent> intentArray = new ArrayList<PendingIntent>();
+    public ArrayList<ClockOverview> clockList;
     private String createMessage;
     private Calendar calendar;
 
@@ -41,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         calendar = Calendar.getInstance();
+        shref = getPreferences(MODE_PRIVATE);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -59,13 +71,19 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 10);
 
-        final ArrayList<ClockOverview> clockList = new ArrayList<ClockOverview>();
+        Gson gson = new Gson();
+        String response = shref.getString("data", "");
+        if (shref.contains("data"))
+            clockList = gson.fromJson(response, new TypeToken<List<ClockOverview>>() {
+            }.getType());
+        else
+            clockList = new ArrayList<ClockOverview>();
 
         final ListView clockView = (ListView) findViewById(R.id.clockView);
         ClockAdapter adapter = new ClockAdapter(this, clockList);
         clockView.setAdapter(adapter);
 
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
@@ -85,12 +103,18 @@ public class MainActivity extends AppCompatActivity {
                         Long differ = calendar.getTimeInMillis() - currentTime;
                         if (differ <= 0) {
                             differ += 86400000;
-                            calendar.add(Calendar.HOUR_OF_DAY, 1);
+                            calendar.add(Calendar.DATE, 1);
                         }
 
-                        clockList.add(new ClockOverview(dfTime.format(calendar.getTime()), requestCode, calendar));
+                        clockList.add(new ClockOverview(dfTime.format(calendar.getTime()), requestCode, calendar, true));
                         ClockAdapter adapter = new ClockAdapter(MainActivity.this, clockList);
                         clockView.setAdapter(adapter);
+
+                        SharedPreferences.Editor editor = shref.edit();
+                        Gson gson = new Gson();
+                        String json = gson.toJson(clockList);
+                        editor.putString("data", json);
+                        editor.commit();
 
                         createMessage = String.format(Locale.CHINESE, "%d hour, %d min",
                                 TimeUnit.MILLISECONDS.toHours(differ),
@@ -129,9 +153,20 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            ListView clockView = (ListView) findViewById(R.id.clockView);
+            clockList = new ArrayList<ClockOverview>();
+            ClockAdapter adapter = new ClockAdapter(this, clockList);
+            clockView.setAdapter(adapter);
+
+            SharedPreferences.Editor editor = shref.edit();
+            Gson gson = new Gson();
+            String json = gson.toJson(new ArrayList<ClockOverview>());
+            editor.putString("data", json);
+            editor.commit();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 }

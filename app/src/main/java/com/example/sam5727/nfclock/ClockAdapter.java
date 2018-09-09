@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,8 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -49,10 +53,19 @@ public class ClockAdapter extends ArrayAdapter<ClockOverview> {
         caseValue.setText("今天");
 
         Switch clockSwitch = (Switch) listItemView.findViewById(R.id.clockSwitch);
-        clockSwitch.setChecked(true);
+        clockSwitch.setOnCheckedChangeListener(null);
+        clockSwitch.setChecked(currentClockOverview.isChecked());
         clockSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                currentClockOverview.setChecked(isChecked);
+                SharedPreferences shref = activity.getPreferences(MainActivity.MODE_PRIVATE);
+                SharedPreferences.Editor editor = shref.edit();
+                Gson gson = new Gson();
+                String json = gson.toJson(((MainActivity) activity).clockList);
+                editor.putString("data", json);
+                editor.commit();
+
                 int requestCode = currentClockOverview.getRequestCode();
                 Intent intent = new Intent(activity, Alarm.class);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(activity, requestCode, intent, 0);
@@ -73,9 +86,8 @@ public class ClockAdapter extends ArrayAdapter<ClockOverview> {
                             TimeUnit.MILLISECONDS.toHours(differ),
                             TimeUnit.MILLISECONDS.toMinutes(differ) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(differ))
                     );
-
                     alarmManager.set(AlarmManager.RTC_WAKEUP, currentClockOverview.getCalendar().getTimeInMillis(), pendingIntent);
-                    Snackbar.make(buttonView, createMessage, Snackbar.LENGTH_LONG)
+                    Snackbar.make(((MainActivity) activity).fab, createMessage, Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 } else
                     alarmManager.cancel(pendingIntent);
@@ -92,5 +104,4 @@ public class ClockAdapter extends ArrayAdapter<ClockOverview> {
 
         return listItemView;
     }
-
 }
