@@ -6,6 +6,8 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class ClockAdapter extends ArrayAdapter<ClockOverview> {
 
@@ -52,9 +57,27 @@ public class ClockAdapter extends ArrayAdapter<ClockOverview> {
                 Intent intent = new Intent(activity, Alarm.class);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(activity, requestCode, intent, 0);
                 AlarmManager alarmManager = (AlarmManager) activity.getSystemService(MainActivity.ALARM_SERVICE);
-                if (isChecked)
+                if (isChecked) {
+                    Calendar tmp = Calendar.getInstance();
+                    tmp.set(Calendar.SECOND, 0);
+                    tmp.set(Calendar.MILLISECOND, 0);
+                    Long differ = currentClockOverview.getCalendar().getTimeInMillis() - tmp.getTimeInMillis();
+                    if (differ <= 0) {
+                        differ += 86400000;
+                        tmp = currentClockOverview.getCalendar();
+                        tmp.add(Calendar.HOUR_OF_DAY, 1);
+                        currentClockOverview.setCalendar(tmp);
+                    }
+
+                    String createMessage = String.format(Locale.CHINESE, "%d hour, %d min",
+                            TimeUnit.MILLISECONDS.toHours(differ),
+                            TimeUnit.MILLISECONDS.toMinutes(differ) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(differ))
+                    );
+
                     alarmManager.set(AlarmManager.RTC_WAKEUP, currentClockOverview.getCalendar().getTimeInMillis(), pendingIntent);
-                else
+                    Snackbar.make(buttonView, createMessage, Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                } else
                     alarmManager.cancel(pendingIntent);
             }
         });
