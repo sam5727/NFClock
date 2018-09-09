@@ -49,14 +49,13 @@ public class ClockAdapter extends ArrayAdapter<ClockOverview> {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 int requestCode = currentClockOverview.getRequestCode();
-                if (isChecked) {
-
-                } else {
-                    Intent intent = new Intent(activity, Alarm.class);
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(activity, requestCode, intent, 0);
-                    AlarmManager alarmManager = (AlarmManager) activity.getSystemService(MainActivity.ALARM_SERVICE);
+                Intent intent = new Intent(activity, Alarm.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(activity, requestCode, intent, 0);
+                AlarmManager alarmManager = (AlarmManager) activity.getSystemService(MainActivity.ALARM_SERVICE);
+                if (isChecked)
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, currentClockOverview.getCalendar().getTimeInMillis(), pendingIntent);
+                else
                     alarmManager.cancel(pendingIntent);
-                }
             }
         });
 
