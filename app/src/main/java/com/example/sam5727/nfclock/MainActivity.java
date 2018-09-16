@@ -162,8 +162,23 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, clockOverview.getTime(), Toast.LENGTH_LONG).show();
                 return true;
             case R.id.delete:
-                // remove stuff here
-                Toast.makeText(MainActivity.this, "delete", Toast.LENGTH_LONG).show();
+                if (clockOverview.isChecked()){
+                    Intent intent = new Intent(MainActivity.this, Alarm.class);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, clockOverview.getRequestCode(), intent, 0);
+                    AlarmManager alarmManager = (AlarmManager) getSystemService(MainActivity.ALARM_SERVICE);
+                    alarmManager.cancel(pendingIntent);
+                }
+                clockList.remove(info.position);
+                adapter = new ClockAdapter(this, clockList);
+                ListView clockView = (ListView) findViewById(R.id.clockView);
+                clockView.setAdapter(adapter);
+
+                SharedPreferences.Editor editor = shref.edit();
+                Gson gson = new Gson();
+                String json = gson.toJson(clockList);
+                editor.putString("data", json);
+                editor.commit();
+
                 return true;
             default:
                 return super.onContextItemSelected(item);
