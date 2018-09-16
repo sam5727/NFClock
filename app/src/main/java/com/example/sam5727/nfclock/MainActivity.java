@@ -17,9 +17,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -82,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
         final ListView clockView = (ListView) findViewById(R.id.clockView);
         ClockAdapter adapter = new ClockAdapter(this, clockList);
         clockView.setAdapter(adapter);
+        clockView.setOnItemClickListener(null);
+        registerForContextMenu(clockView);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -135,6 +140,34 @@ public class MainActivity extends AppCompatActivity {
                 }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show();
             }
         });
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId() == R.id.clockView) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.menu_list, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        ClockAdapter adapter = new ClockAdapter(this, clockList);
+        ClockOverview clockOverview = adapter.getItem(info.position);
+        switch(item.getItemId()) {
+            case R.id.edit:
+                // edit stuff here
+                Toast.makeText(MainActivity.this, clockOverview.getTime(), Toast.LENGTH_LONG).show();
+                return true;
+            case R.id.delete:
+                // remove stuff here
+                Toast.makeText(MainActivity.this, "delete", Toast.LENGTH_LONG).show();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
     @Override

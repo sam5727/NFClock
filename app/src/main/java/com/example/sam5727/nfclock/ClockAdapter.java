@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -95,12 +97,8 @@ public class ClockAdapter extends ArrayAdapter<ClockOverview> {
         });
 
         LinearLayout clockLayout = (LinearLayout) listItemView.findViewById(R.id.clockLayout);
-        clockLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        clockLayout.setOnLongClickListener(null);
 
-            }
-        });
 
         return listItemView;
     }
