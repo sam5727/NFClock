@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private SimpleDateFormat dfTime = new SimpleDateFormat("HH:mm", Locale.CHINESE);
     private SimpleDateFormat dfDate = new SimpleDateFormat("M月d日, EEEE", Locale.CHINESE);
     private ArrayList<PendingIntent> intentArray = new ArrayList<PendingIntent>();
-    public ArrayList<ClockOverview> clockList;
+    public ArrayList<ClockOverview> clockList = new ArrayList<ClockOverview>();
     private String createMessage;
     private Calendar calendar;
 
@@ -200,7 +200,16 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_delete_all) {
+            for (ClockOverview co : clockList) {
+                if (co.isChecked()){
+                    Intent intent = new Intent(MainActivity.this, Alarm.class);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, co.getRequestCode(), intent, 0);
+                    AlarmManager alarmManager = (AlarmManager) getSystemService(MainActivity.ALARM_SERVICE);
+                    alarmManager.cancel(pendingIntent);
+                }
+            }
+
             ListView clockView = (ListView) findViewById(R.id.clockView);
             clockList = new ArrayList<ClockOverview>();
             ClockAdapter adapter = new ClockAdapter(this, clockList);
@@ -212,6 +221,8 @@ public class MainActivity extends AppCompatActivity {
             editor.putString("data", json);
             editor.commit();
             return true;
+        } else if (id == R.id.action_settings){
+
         }
 
         return super.onOptionsItemSelected(item);
