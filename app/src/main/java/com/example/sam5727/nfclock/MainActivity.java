@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<ClockOverview> clockList = new ArrayList<ClockOverview>();
     private String createMessage;
     private Calendar calendar;
+    private ClockAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             clockList = new ArrayList<ClockOverview>();
 
         final ListView clockView = (ListView) findViewById(R.id.clockView);
-        ClockAdapter adapter = new ClockAdapter(this, clockList);
+        adapter = new ClockAdapter(this, clockList);
         clockView.setAdapter(adapter);
         clockView.setOnItemClickListener(null);
         registerForContextMenu(clockView);
@@ -112,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         clockList.add(new ClockOverview(dfTime.format(calendar.getTime()), requestCode, calendar, true));
-                        ClockAdapter adapter = new ClockAdapter(MainActivity.this, clockList);
+                        adapter = new ClockAdapter(MainActivity.this, clockList);
                         clockView.setAdapter(adapter);
 
                         SharedPreferences.Editor editor = shref.edit();
@@ -127,7 +128,29 @@ public class MainActivity extends AppCompatActivity {
                         );
 
                         Snackbar.make(view, createMessage, Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
+                                .setAction("UNDO", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        ClockOverview c = clockList.get(clockList.size() -1);
+
+                                        // delete intent
+                                        Intent intent = new Intent(MainActivity.this, Alarm.class);
+                                        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, c.getRequestCode(), intent, 0);
+                                        AlarmManager alarmManager = (AlarmManager) getSystemService(MainActivity.ALARM_SERVICE);
+                                        alarmManager.cancel(pendingIntent);
+
+                                        clockList.remove(c);
+                                        adapter = new ClockAdapter(MainActivity.this, clockList);
+                                        ListView clockView = (ListView) findViewById(R.id.clockView);
+                                        clockView.setAdapter(adapter);
+
+                                        SharedPreferences.Editor editor = shref.edit();
+                                        Gson gson = new Gson();
+                                        String json = gson.toJson(clockList);
+                                        editor.putString("data", json);
+                                        editor.commit();
+                                    }
+                                }).show();
 
                         Log.e("ttt", calendar.getTimeInMillis() + "");
                         // Set broadcast
@@ -227,5 +250,4 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
 }
