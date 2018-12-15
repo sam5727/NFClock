@@ -22,6 +22,10 @@ public class Alarm extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Toast.makeText(context, "ALARM", Toast.LENGTH_LONG).show();
 
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
+        wakeLock.acquire(10000);
+
         Vibrator v = (Vibrator) context.getSystemService(Service.VIBRATOR_SERVICE);
         v.vibrate(5000);
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
