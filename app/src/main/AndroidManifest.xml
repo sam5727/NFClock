@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-feature
         android:name="android.hardware.nfc"
@@ -30,7 +31,10 @@
 
         <receiver android:name=".Alarm" />
 
-        <activity android:name=".UnlockActivity"></activity>
+        <activity android:name=".UnlockActivity"
+            android:showOnLockScreen="true"
+            android:screenOrientation="sensorPortrait">
+        </activity>
     </application>
 
 </manifest>

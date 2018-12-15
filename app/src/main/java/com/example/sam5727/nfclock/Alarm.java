@@ -9,6 +9,7 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -72,5 +73,8 @@ public class Alarm extends BroadcastReceiver {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        Intent unlockIntent = new Intent(context, UnlockActivity.class);
+        context.startActivity(unlockIntent);
     }
 }

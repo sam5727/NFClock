@@ -165,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("ttt", calendar.getTimeInMillis() + "");
                         // Set broadcast
                         Intent intent = new Intent(MainActivity.this, Alarm.class);
+                        intent.putExtra("timestamp", calendar.getTimeInMillis());
                         PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, requestCode, intent, 0);
                         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
                         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
