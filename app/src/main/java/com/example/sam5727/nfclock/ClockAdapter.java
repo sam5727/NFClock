@@ -81,7 +81,7 @@ public class ClockAdapter extends ArrayAdapter<ClockOverview> {
                     if (differ <= 0) {
                         differ += 86400000;
                         tmp = currentClockOverview.getCalendar();
-                        tmp.add(Calendar.HOUR_OF_DAY, 1);
+                        tmp.add(Calendar.DATE, 1);
                         currentClockOverview.setCalendar(tmp);
                     }
 
