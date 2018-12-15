@@ -1,6 +1,10 @@
 package com.example.sam5727.nfclock;
 
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,6 +16,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.PowerManager;
 import android.os.Vibrator;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -26,8 +31,32 @@ public class Alarm extends BroadcastReceiver {
         PowerManager.WakeLock wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
         wakeLock.acquire(10000);
 
+//        int NOTIFICATION_ID = 234;
+//        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+//        String CHANNEL_ID = "my_channel_01";
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//            CharSequence name = "my_channel";
+//            int importance = NotificationManager.IMPORTANCE_HIGH;
+//            NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+//            mChannel.enableVibration(false);
+//            mChannel.se
+//            notificationManager.createNotificationChannel(mChannel);
+//        }
+//
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+//                .setSmallIcon(R.drawable.ic_add_alarm)
+//                .setContentTitle("Bring me front!")
+//                .setContentText("Bring me!!! BRING!!!")
+//                .setOngoing(true)
+//                .setAutoCancel(true)
+//                .setVibrate(null)
+//                .setFullScreenIntent(null, true);
+//
+//        notificationManager.notify(NOTIFICATION_ID, builder.build());
+
         Vibrator v = (Vibrator) context.getSystemService(Service.VIBRATOR_SERVICE);
-        v.vibrate(5000);
+        long[] pattern = {0, 1500, 1000};
+        v.vibrate(pattern, 0);
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);;
         int actualVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
