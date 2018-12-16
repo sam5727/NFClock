@@ -33,12 +33,12 @@ public class UnlockActivity extends AppCompatActivity {
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
     }
-
+//
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (intent.hasExtra(NfcAdapter.EXTRA_TAG)) {
-            Toast.makeText(this, "NFC intent", Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, "NFC intent", Toast.LENGTH_LONG).show();
             Parcelable[] parcelables = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
             if (parcelables != null && parcelables.length > 0) {
                 readTextFromMessage((NdefMessage) parcelables[0]);
@@ -50,7 +50,7 @@ public class UnlockActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         // enable fore ground dispatch
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, UnlockActivity.class);
         intent.addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         IntentFilter[] intentFilters = new IntentFilter[]{};
@@ -71,8 +71,9 @@ public class UnlockActivity extends AppCompatActivity {
             NdefRecord ndefRecord = ndefRecords[0];
             String tagContent = getTextFromNdefRecord(ndefRecord);
             if (tagContent.equals("sam5727")) {
-                Log.e("Detect Successfully", "TES");
-            }
+                Toast.makeText(this, "YES detect", Toast.LENGTH_LONG).show();
+            } else
+                Toast.makeText(this, "NO detect", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(this, "No NDEF records found", Toast.LENGTH_LONG).show();
         }

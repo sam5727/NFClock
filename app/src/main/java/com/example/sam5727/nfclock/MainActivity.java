@@ -162,13 +162,21 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 }).show();
 
-                        Log.e("ttt", calendar.getTimeInMillis() + "");
+                        Log.e("timestamp", calendar.getTimeInMillis() + "");
                         // Set broadcast
                         Intent intent = new Intent(MainActivity.this, Alarm.class);
                         intent.putExtra("timestamp", calendar.getTimeInMillis());
                         PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, requestCode, intent, 0);
+
                         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-                        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                        } else if (Build.VERSION.SDK_INT >=  Build.VERSION_CODES.KITKAT) {
+                            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                        } else {
+                            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                        }
+
                         intentArray.add(pendingIntent);
                     }
                 }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show();

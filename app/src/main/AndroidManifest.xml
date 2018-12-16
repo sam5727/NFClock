@@ -29,11 +29,12 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".Alarm" />
+        <receiver android:name=".Alarm"/>
 
         <activity android:name=".UnlockActivity"
             android:showOnLockScreen="true"
             android:screenOrientation="sensorPortrait">
+
         </activity>
     </application>
 
