@@ -89,7 +89,15 @@ public class ClockAdapter extends ArrayAdapter<ClockOverview> {
                             TimeUnit.MILLISECONDS.toHours(differ),
                             TimeUnit.MILLISECONDS.toMinutes(differ) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(differ))
                     );
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, currentClockOverview.getCalendar().getTimeInMillis(), pendingIntent);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, currentClockOverview.getCalendar().getTimeInMillis(), pendingIntent);
+                    } else if (Build.VERSION.SDK_INT >=  Build.VERSION_CODES.KITKAT) {
+                        alarmManager.setExact(AlarmManager.RTC_WAKEUP, currentClockOverview.getCalendar().getTimeInMillis(), pendingIntent);
+                    } else {
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, currentClockOverview.getCalendar().getTimeInMillis(), pendingIntent);
+                    }
+                    
                     Snackbar.make(((MainActivity) activity).fab, createMessage, Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 } else
