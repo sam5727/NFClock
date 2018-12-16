@@ -55,25 +55,6 @@ public class Alarm extends BroadcastReceiver {
 //
 //        notificationManager.notify(NOTIFICATION_ID, builder.build());
 
-        Vibrator v = (Vibrator) context.getSystemService(Service.VIBRATOR_SERVICE);
-        long[] pattern = {0, 1500, 1000};
-        v.vibrate(pattern, 0);
-        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);;
-        int actualVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
-        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, actualVolume, AudioManager.ADJUST_SAME);
-
-        MediaPlayer player = new MediaPlayer();
-        try {
-            player.setAudioStreamType(AudioManager.STREAM_ALARM);
-            player.setDataSource(context, notification);
-            player.setLooping(true);
-            player.prepare();
-            player.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         Intent unlockIntent = new Intent(context, UnlockActivity.class);
         context.startActivity(unlockIntent);
     }

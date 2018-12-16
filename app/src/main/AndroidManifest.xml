@@ -31,10 +31,7 @@
 
         <receiver android:name=".Alarm"/>
 
-        <activity android:name=".UnlockActivity"
-            android:showOnLockScreen="true"
-            android:screenOrientation="sensorPortrait">
-
+        <activity android:name=".UnlockActivity">
         </activity>
     </application>
 

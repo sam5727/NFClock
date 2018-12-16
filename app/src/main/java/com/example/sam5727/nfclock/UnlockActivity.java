@@ -1,20 +1,28 @@
 package com.example.sam5727.nfclock;
 
 import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.NdefFormatable;
 import android.os.Parcelable;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 public class UnlockActivity extends AppCompatActivity {
@@ -25,13 +33,27 @@ public class UnlockActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_unlock);
-
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON|
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD|
-                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED|
-                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
+        Vibrator v = (Vibrator) getSystemService(Service.VIBRATOR_SERVICE);
+        long[] pattern = {0, 1500, 1000};
+        v.vibrate(pattern, 0);
+        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);;
+        int actualVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
+        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, actualVolume, AudioManager.ADJUST_SAME);
+
+        MediaPlayer player = new MediaPlayer();
+        try {
+            player.setAudioStreamType(AudioManager.STREAM_ALARM);
+            player.setDataSource(this, notification);
+            player.setLooping(true);
+            player.prepare();
+            player.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 //
     @Override

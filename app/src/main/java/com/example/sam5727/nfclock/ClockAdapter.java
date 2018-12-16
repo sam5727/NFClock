@@ -97,7 +97,7 @@ public class ClockAdapter extends ArrayAdapter<ClockOverview> {
                     } else {
                         alarmManager.set(AlarmManager.RTC_WAKEUP, currentClockOverview.getCalendar().getTimeInMillis(), pendingIntent);
                     }
-                    
+
                     Snackbar.make(((MainActivity) activity).fab, createMessage, Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 } else
